@@ -13,6 +13,7 @@ We will start from simple and then build on
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #define MAX 1024
 void shellLoop(void); //declaration for our shell loop
 char *command(void);
@@ -25,15 +26,15 @@ int main(void){
 
 void shellLoop(void){
 	bool shellRunning = true;
-	char *user = NULL;
+	char *userCommand = malloc(sizeof(char)*MAX);
+	int pointer = 0;
 	/*
 	Usually shells allow users to enter word like 'quit', 'QUIT', 'q', or 'Q' if they want to exit the loop.
 	Lets have a loop, now our loop could either be a while or do...while loop, but lets work with a while loop first
 	*/
 	while(shellRunning){ //based on a condition our loop/shell will still run
-
-		user = command();
-		printf("%s",user);
+		userCommand = command();
+		printf("\n%s",userCommand);
 		//Here we are going to handle exit shell
 		/*
 		Now the thing about this exit is that in an actal shell such as bash,
@@ -45,17 +46,22 @@ void shellLoop(void){
 }
 
 char *command(void){
-	char *user = malloc(sizeof(char)*MAX); //Hold up to 1024 bytes
-
-	//Ensure user is not pointing to NULL
-	if(!user){
-		printf("Unexpected Error");
-		exit(EXIT_FAILURE);
+	char c;
+	int pointer = 0;
+	char *command = malloc(sizeof(char)*MAX);
+	//command[pointer] = c;
+	while(1){
+		c = getchar();
+		if(c == EOF || c == '\n'){
+			command[pointer] = '\0';
+			return command;
+		}
+		//printf("Helo");
+		*(command+pointer) = c;
+		pointer+=1;
 	}
-	fgets(user,MAX,stdin);
-	return user;
+	free(command);
 }
-
 //Here we will have a function to handle the exit
 int exitShell(void){
 	return 0;
