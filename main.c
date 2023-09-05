@@ -8,15 +8,15 @@ Well a shell is just a command line interface that allows the user to enter comm
 We will start from simple and then build on
 */
 
-
 //First thing i will do is just include our standard input/output
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #define MAX 1024
-void shellLoop(void); //declaration for our shell loop
+int shellLoop(void); //declaration for our shell loop
 char *command(void);
+int parseCommand(char * val);
 int exitShell(void);
 //As we know a shell is actually just a while loop
 
@@ -24,7 +24,7 @@ int main(void){
 	shellLoop();
 }
 
-void shellLoop(void){
+int shellLoop(void){
 	bool shellRunning = true;
 	char *userCommand = malloc(sizeof(char)*MAX);
 	int pointer = 0;
@@ -34,6 +34,10 @@ void shellLoop(void){
 	*/
 	while(shellRunning){ //based on a condition our loop/shell will still run
 		userCommand = command();
+		if(!parseCommand(userCommand)){
+			printf("\nlogout\n");
+			return 0;
+		}
 		printf("\n%s",userCommand);
 		//Here we are going to handle exit shell
 		/*
@@ -61,6 +65,15 @@ char *command(void){
 		pointer+=1;
 	}
 	free(command);
+}
+
+int parseCommand(char *val){
+	char * delimeter = " ";
+	char * com = strtok(val,delimeter);
+	//Only test the first value to see if it is equal to 'q' or 'Q' or 'QUIT' or 'quit'
+	if(strcmp(com,"exit")){
+		return 0;
+	}
 }
 //Here we will have a function to handle the exit
 int exitShell(void){
