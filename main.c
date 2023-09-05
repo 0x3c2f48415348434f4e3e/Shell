@@ -34,11 +34,12 @@ int shellLoop(void){
 	*/
 	while(shellRunning){ //based on a condition our loop/shell will still run
 		userCommand = command();
-		if(!parseCommand(userCommand)){
+		if(parseCommand(userCommand) == 0){
+			//(Testing) printf("\n%s\n",userCommand);
 			printf("\nlogout\n");
-			return 0;
+			return exitShell();
 		}
-		printf("\n%s",userCommand);
+		//(Testing)printf("\n%s",userCommand);
 		//Here we are going to handle exit shell
 		/*
 		Now the thing about this exit is that in an actal shell such as bash,
@@ -71,11 +72,13 @@ int parseCommand(char *val){
 	char * delimeter = " ";
 	char * com = strtok(val,delimeter);
 	//Only test the first value to see if it is equal to 'q' or 'Q' or 'QUIT' or 'quit'
-	if(strcmp(com,"exit")){
+	if(strcmp(com,"exit") == 0){
+		//(Testing)printf("\n%s is equal to exit\n",val);
 		return 0;
 	}
+	return 1;
 }
 //Here we will have a function to handle the exit
 int exitShell(void){
-	return 0;
+	exit(EXIT_SUCCESS);
 }
