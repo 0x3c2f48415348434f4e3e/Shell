@@ -7,3 +7,8 @@ Will try to improve on it as i work on it
 
 # What happnes when you run a command in Linux
 [Link][https://www.makeuseof.com/what-happens-when-you-run-command-linux/#:~:text=When%20you%20enter%20a%20command%2C%20the%20first%20thing,to%20the%20first%20token%20in%20the%20command%20line.]
+
+# Auto-compilation
+Socket has the family called UNIX.
+Can use this knowledge to create some sort of server that listens to changes within the our C-file based on something
+like the time/date and then compiles if it notices any changes.
