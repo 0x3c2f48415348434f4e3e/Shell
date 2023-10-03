@@ -18,6 +18,10 @@ int shellLoop(void); //declaration for our shell loop
 char *command(void);
 int parseCommand(char * val);
 int exitShell(void);
+
+//Display the files and directory
+char * displayFiles(void); //Should return an array of strings containing the files and folders
+
 //As we know a shell is actually just a while loop
 
 int main(void){
@@ -27,7 +31,7 @@ int main(void){
 int shellLoop(void){
 	bool shellRunning = true;
 	char *userCommand = malloc(sizeof(char)*MAX);
-	int pointer = 0;
+	//int pointer = 0; Comment this out for now
 	/*
 	Usually shells allow users to enter word like 'quit', 'QUIT', 'q', or 'Q' if they want to exit the loop.
 	Lets have a loop, now our loop could either be a while or do...while loop, but lets work with a while loop first
@@ -37,7 +41,7 @@ int shellLoop(void){
 		if(parseCommand(userCommand) == 0){
 			//(Testing) printf("\n%s\n",userCommand);
 			printf("\nlogout\n");
-			return exitShell();
+			shellRunning = false;
 		}
 		//(Testing)printf("\n%s",userCommand);
 		//Here we are going to handle exit shell
@@ -48,6 +52,7 @@ int shellLoop(void){
 		automatically quits the shell
 		*/
 	}
+	return exitShell();
 }
 
 char *command(void){
@@ -61,7 +66,6 @@ char *command(void){
 			command[pointer] = '\0';
 			return command;
 		}
-		//printf("Helo");
 		*(command+pointer) = c;
 		pointer+=1;
 	}
@@ -77,6 +81,14 @@ int parseCommand(char *val){
 		return 0;
 	}
 	return 1;
+}
+
+char * displayFiles(void){
+
+//Create structure type
+	struct dirent display;
+	https://www.gnu.org/software/libc/manual/html_node/Directory-Entries.html
+
 }
 //Here we will have a function to handle the exit
 int exitShell(void){

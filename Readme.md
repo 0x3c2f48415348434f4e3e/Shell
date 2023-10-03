@@ -12,3 +12,12 @@ Will try to improve on it as i work on it
 Socket has the family called UNIX.
 Can use this knowledge to create some sort of server that listens to changes within the our C-file based on something
 like the time/date and then compiles if it notices any changes.
+
+# Basic functionality of a shell
+Using the shell gives us full control over our system. Now the shell is like an intepreter (Program) and  it riuns inside something called a terminal. The terminal is just an interface/application that runs the shell
+
+Some functionality that a shell should obviously have includes:
+1. Logging into the shell [Leave this for later]
+2. Logging out of a shell (So if a user enters the exit command, they will exit the shell) [Done]
+
+3. Displaying the file contents on the terminal
