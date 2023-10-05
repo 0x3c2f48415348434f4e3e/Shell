@@ -13,14 +13,16 @@ We will start from simple and then build on
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h> //POSIX
+#include <unistd.h>
 #define MAX 1024
 int shellLoop(void); //declaration for our shell loop
 char *command(void);
 int parseCommand(char * val);
 int exitShell(void);
-
+char * currenWorkingdirectory = malloc(sizeof(char)*1024);
 //Display the files and directory
-char * displayFiles(void); //Should return an array of strings containing the files and folders
+void displayFiles(void); //Should return an array of strings containing the files and folders
 
 //As we know a shell is actually just a while loop
 
@@ -38,10 +40,14 @@ int shellLoop(void){
 	*/
 	while(shellRunning){ //based on a condition our loop/shell will still run
 		userCommand = command();
+		char * lfd = "list";
 		if(parseCommand(userCommand) == 0){
 			//(Testing) printf("\n%s\n",userCommand);
 			printf("\nlogout\n");
 			shellRunning = false;
+		}
+		else if(strcmp(userCommand,"lfd")){
+			displayFiles();
 		}
 		//(Testing)printf("\n%s",userCommand);
 		//Here we are going to handle exit shell
@@ -83,12 +89,21 @@ int parseCommand(char *val){
 	return 1;
 }
 
-char * displayFiles(void){
+void displayFiles(void){
 
 //Create structure type
 	struct dirent display;
 	https://www.gnu.org/software/libc/manual/html_node/Directory-Entries.html
+	//If 'list' is entered, it displays only non-hidden files and directories
 
+
+	//opendir()
+	//Concept of my 'list' is that it gets current direcotry and list the
+	//direcotry and files in that
+	if(getcwd(currenWorkingdirectory, sizeof(1024)) == NULL){
+		printf("Something went wrong");
+	}
+	//Finish this
 }
 //Here we will have a function to handle the exit
 int exitShell(void){
