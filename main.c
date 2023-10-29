@@ -15,12 +15,17 @@ We will start from simple and then build on
 #include <string.h>
 #include <dirent.h> //POSIX
 #include <unistd.h>
+#define _POSIX_SOURCE
+#include <dirent.h>
+#include <errno.h>
+#include <sys/tyoes.h>
+#undef _POSIX_SOURCE
 #define MAX 1024
 int shellLoop(void); //declaration for our shell loop
 char *command(void);
 int parseCommand(char * val);
 int exitShell(void);
-char * currenWorkingdirectory = malloc(sizeof(char)*1024);
+//char * currenWorkingdirectory = malloc(sizeof(char)*1024);
 //Display the files and directory
 void displayFiles(void); //Should return an array of strings containing the files and folders
 
@@ -40,13 +45,13 @@ int shellLoop(void){
 	*/
 	while(shellRunning){ //based on a condition our loop/shell will still run
 		userCommand = command();
-		char * lfd = "list";
+		char * lfd = "ls";
 		if(parseCommand(userCommand) == 0){
 			//(Testing) printf("\n%s\n",userCommand);
 			printf("\nlogout\n");
 			shellRunning = false;
 		}
-		else if(strcmp(userCommand,"lfd")){
+		else if(strcmp(userCommand,lfd) == 0){
 			displayFiles();
 		}
 		//(Testing)printf("\n%s",userCommand);
@@ -92,18 +97,14 @@ int parseCommand(char *val){
 void displayFiles(void){
 
 //Create structure type
-	struct dirent display;
-	https://www.gnu.org/software/libc/manual/html_node/Directory-Entries.html
+	struct dirent *display;
+	DIR *dir;
+	char *CWD = malloc(sizeof(char*1024));
+	//https://www.gnu.org/software/libc/manual/html_node/Directory-Entries.html
 	//If 'list' is entered, it displays only non-hidden files and directories
-
-
-	//opendir()
-	//Concept of my 'list' is that it gets current direcotry and list the
-	//direcotry and files in that
-	if(getcwd(currenWorkingdirectory, sizeof(1024)) == NULL){
-		printf("Something went wrong");
-	}
-	//Finish this
+//https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-readdir-read-entry-from-directory
+	if(getcwd(CWD,sizeof(CWD) == NULL) return //retrun bad request
+	if((dir = opendir(""
 }
 //Here we will have a function to handle the exit
 int exitShell(void){
