@@ -1,3 +1,2 @@
-#!/usr/bin/bash
+gcc main.c -o output
 
-gcc -Wall -pedantic main.c -o main

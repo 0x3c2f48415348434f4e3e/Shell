@@ -1,112 +1,177 @@
-//Here we are going to be writing a shell
+#include"HEADERFILES.h"
+#define clearTerminal() printf("\033[H\033[J")
 
-/*
-What does a shell do
+//void initBool(void){
+static enum boolean false = FALSE;
+static enum boolean true = TRUE;
+static enum boolean isMultipleCharacter = FALSE;
 
-Well a shell is just a command line interface that allows the user to enter command whihc will can directly communcate the OS.
-
-We will start from simple and then build on
-*/
-
-//First thing i will do is just include our standard input/output
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h> //POSIX
-#include <unistd.h>
-#define _POSIX_SOURCE
-#include <dirent.h>
-#include <errno.h>
-#include <sys/tyoes.h>
-#undef _POSIX_SOURCE
-#define MAX 1024
-int shellLoop(void); //declaration for our shell loop
-char *command(void);
-int parseCommand(char * val);
-int exitShell(void);
-//char * currenWorkingdirectory = malloc(sizeof(char)*1024);
-//Display the files and directory
-void displayFiles(void); //Should return an array of strings containing the files and folders
-
-//As we know a shell is actually just a while loop
-
-int main(void){
-	shellLoop();
+void clear(void){
+	//to clear out terminal
+	clearTerminal();
 }
 
-int shellLoop(void){
-	bool shellRunning = true;
-	char *userCommand = malloc(sizeof(char)*MAX);
-	//int pointer = 0; Comment this out for now
-	/*
-	Usually shells allow users to enter word like 'quit', 'QUIT', 'q', or 'Q' if they want to exit the loop.
-	Lets have a loop, now our loop could either be a while or do...while loop, but lets work with a while loop first
-	*/
-	while(shellRunning){ //based on a condition our loop/shell will still run
-		userCommand = command();
-		char * lfd = "ls";
-		if(parseCommand(userCommand) == 0){
-			//(Testing) printf("\n%s\n",userCommand);
-			printf("\nlogout\n");
-			shellRunning = false;
-		}
-		else if(strcmp(userCommand,lfd) == 0){
-			displayFiles();
-		}
-		//(Testing)printf("\n%s",userCommand);
-		//Here we are going to handle exit shell
-		/*
-		Now the thing about this exit is that in an actal shell such as bash,
-		a user is able to enter something like 'quit shell' and it seems like
-		it looks at only the first word and if that is the same as 'quit' then it
-		automatically quits the shell
-		*/
+void display(void){
+	//printf("#    #\n#    #\n# # # # \n#    #\n#    #\n#    #\n");
+	printf("              ╔╗  ╔═══╗\n"
+	"║║ ║║         ║║  ║╔═╗║\n"
+	"║╚═╝║╔══╗ ╔══╗║╚═╗║║ ╚╝╔══╗╔══╗\n"
+	"║╔═╗║╚ ╗║ ║══╣║╔╗║║║ ╔╗║╔╗║║╔╗║\n"
+	"║║ ║║║╚╝╚╗╠══║║║║║║╚═╝║║╚╝║║║║║\n"
+	"╚╝ ╚╝╚═══╝╚══╝╚╝╚╝╚═══╝╚══╝╚╝╚╝\n");
+}
+
+void printUserDes(char* s1, char* s2, char* s3){
+	printf("%s%s%s$ ",s1,s2,s3);
+}
+
+void releaseResources(char* a){
+	free(a);
+}
+
+void getUserEnvironmentVariable(void){
+	char * User = getenv("USER");
+	char * addSign = ":";
+	//printf("%s\n",addSign);
+	char * getPath = getcwd(NULL,0);
+	if(getPath == NULL){
+		perror("getcwd");
+		exit(EXIT_FAILURE);
 	}
-	return exitShell();
+	//printf("%s\n",getPath);
+	printUserDes(User,addSign,getPath);
 }
 
-char *command(void){
+
+//lets get some input from users
+char* getInput(void){
+	//I am going to try and do it the hard way
 	char c;
+	int buffer = 1024;
 	int pointer = 0;
-	char *command = malloc(sizeof(char)*MAX);
-	//command[pointer] = c;
-	while(1){
+	char * userInput = malloc(sizeof(char)*buffer);
+	if(userInput == NULL){
+		perror("Coud not allocate Space");
+		exit(EXIT_FAILURE);
+	}
+
+	while(true){
 		c = getchar();
 		if(c == EOF || c == '\n'){
-			command[pointer] = '\0';
-			return command;
+			userInput[pointer] = '\n'; //for null terminating character
+			//return userInput;
+			break;
 		}
-		*(command+pointer) = c;
-		pointer+=1;
+		userInput[pointer] = c;
+		pointer++;
+		//resize if pointer greater than buffer size
+		if(pointer >= buffer){
+			buffer+=1024;
+			userInput = realloc(userInput,buffer);
+		}
+
+		//check it was successfully reallocated
+		if(userInput == NULL){
+			perror("Could not reallocated space");
+			exit(EXIT_FAILURE);
+		}
 	}
-	free(command);
+	//add_history(userInput); Will add this functionality later
+	return userInput;
 }
 
-int parseCommand(char *val){
-	char * delimeter = " ";
-	char * com = strtok(val,delimeter);
-	//Only test the first value to see if it is equal to 'q' or 'Q' or 'QUIT' or 'quit'
-	if(strcmp(com,"exit") == 0){
-		//(Testing)printf("\n%s is equal to exit\n",val);
-		return 0;
+void cwd(void){
+	char * dir = getcwd(NULL,0);
+	printf("%s\n",dir);
+}
+
+void cls(void){
+        //printf("Clear Screen");
+        clear();
+}
+
+int stringCompare(char *args1, char *args2, int length){
+	//create own string compare functin since the strcmp is not doing as expected
+
+
+	//first lets get the length of args2 since that will be the command we have not got the length of yet
+	int args2length = 0;
+	for(int i=0; args2[i] != '\0'; i++){
+		args2length+=1;
 	}
-	return 1;
+	//remeber to add an extra 1 for the '\0'
+	args2length+=1;
+
+	//now lets check that length and args2length are the same, otherwise, it will not be the same command
+	if(length != args2length){
+		return -1;
+	}
+
+        for(int i=0; i< length; i++){
+		if(args1[i] != args2[i]){
+			return -1;
+		}
+        }
+	return 0;
 }
 
-void displayFiles(void){
+void parseSingleInput(char *args, int length){
+	//printf("To parse inputs");
 
-//Create structure type
-	struct dirent *display;
-	DIR *dir;
-	char *CWD = malloc(sizeof(char*1024));
-	//https://www.gnu.org/software/libc/manual/html_node/Directory-Entries.html
-	//If 'list' is entered, it displays only non-hidden files and directories
-//https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-readdir-read-entry-from-directory
-	if(getcwd(CWD,sizeof(CWD) == NULL) return //retrun bad request
-	if((dir = opendir(""
+	if(stringCompare(args,"cls",length) == 0){
+		cls();
+		return;
+	}
+	else{
+		printf("Error: %sCommand could not be found\n",args);
+	}
 }
-//Here we will have a function to handle the exit
-int exitShell(void){
-	exit(EXIT_SUCCESS);
+void parseMultipleInput(char **args){
+	printf("To parse inputs");
 }
+
+
+void mainLoop(void){
+
+        do{
+	//get the number of inputs (i.e. if user enters 2 seperate strings such as clear me, or just a single string)
+		int length = 0;
+		char * userInput = getInput();
+		for(int i=0; userInput[i] != '\0'; i++){
+			if(userInput[i] == ' '){ //check if it is not a null terminating character
+				length+=1;
+				isMultipleCharacter =  TRUE; //empty character detected
+			}
+			else{
+				length+=1;
+			}
+		}
+		//length will be the total length of user character
+
+		//lets parse the arguments
+		if(!(isMultipleCharacter)){
+			//printf("User Entered a single string\n");
+			//lets handle single characters first
+			parseSingleInput(userInput,length);
+		}
+		else{
+			printf("User Entered Multiple string\n");
+			//we will handle multiple characters later
+		}
+                //printf("%s",getInput());
+                getUserEnvironmentVariable();
+        }
+
+        while(true);
+        cwd();
+}
+
+int main(int argc, char * argv){
+	clearTerminal();
+	display();
+	getUserEnvironmentVariable();
+
+	mainLoop();
+	return 0;
+}
+
