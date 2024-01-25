@@ -4,6 +4,7 @@
 #include<errno.h>
 #include<unistd.h>
 #include<signal.h>
+#include<dirent.h>
 void clearTerminal(void);
 void getUserEnvironmentVariable(void);
 void printUserDes(char* s1, char* s2, char* s3);
@@ -19,3 +20,5 @@ void parseMultipeInputs(char **args);
 void mainLoop(void);
 void cls(void);
 int stringCompare(char* args1, char* args2, int length);
+void exitShell(void);
+void dir(void);

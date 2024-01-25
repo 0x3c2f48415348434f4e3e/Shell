@@ -8,9 +8,35 @@ static enum boolean isMultipleCharacter = FALSE;
 
 void clear(void){
 	//to clear out terminal
-	sleep(5);
+	sleep(3);
 	clearTerminal();
 }
+
+void exitShell(void){
+	//Now to be able to exit our program, we cna use the exit function
+	exit(EXIT_SUCCESS);
+}
+
+void dir(void){
+	//This part is going to be more challenging, as we want to list the directories and files in the current directory
+	//https://pubs.opengroup.org/onlinepubs/7990989775/xsh/readdir.html
+	//Example usage: https://www.geeksforgeeks.org/c-program-list-files-sub-directories-directory/
+	DIR *dirp = opendir(getcwd(NULL,0)); //represents directory stream
+	struct dirent *de;
+	if(dirp == NULL){
+		printf("Unable to open directory");
+		return;
+	}
+
+	while((de = readdir(dirp)) != NULL){
+		printf("%s\t",de->d_name);
+	}
+	printf("\n");
+	closedir(dirp);
+	return;
+}
+
+//later make another type of dir, that will allow user to list dirctories and files ina specific location/path
 
 void display(void){
 	//printf("#    #\n#    #\n# # # # \n#    #\n#    #\n#    #\n");
@@ -105,12 +131,12 @@ int stringCompare(char *args1, char *args2, int length){
 	//printf("Length of args1 is %i and args2 is %i",length,args2length);
 	//now lets check that length and args2length are the same, otherwise, it will not be the same command
 	if(length != args2length){
-		printf("Not same length");
+		//printf("Not same length %i %i", length,args2length);
 		return -1;
 	}
 
         for(int i=0; i< length-1; i++){ //due to some unwanted bug, i made it to be length-1 (so it will not compare the '\0'
-		printf("%c   %c\n",args1[i],args2[i]);
+		//printf("%c   %c\n",args1[i],args2[i]);
 		if(args1[i] != args2[i]){
 			//printf("%c,%c",args1[i],args2[i]);
 			return -1;
@@ -124,6 +150,14 @@ void parseSingleInput(char *args, int length){
 
 	if(stringCompare(args,"cls",length) == 0){
 		cls();
+		return;
+	}
+	else if(stringCompare(args,"exit",length) == 0){
+		exitShell();
+		return;
+	}
+	else if(stringCompare(args,"ls",length) == 0){
+		dir();
 		return;
 	}
 	else{
