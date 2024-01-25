@@ -8,6 +8,7 @@ static enum boolean isMultipleCharacter = FALSE;
 
 void clear(void){
 	//to clear out terminal
+	sleep(5);
 	clearTerminal();
 }
 
@@ -101,14 +102,17 @@ int stringCompare(char *args1, char *args2, int length){
 	}
 	//remeber to add an extra 1 for the '\0'
 	args2length+=1;
-
+	//printf("Length of args1 is %i and args2 is %i",length,args2length);
 	//now lets check that length and args2length are the same, otherwise, it will not be the same command
 	if(length != args2length){
+		printf("Not same length");
 		return -1;
 	}
 
-        for(int i=0; i< length; i++){
+        for(int i=0; i< length-1; i++){ //due to some unwanted bug, i made it to be length-1 (so it will not compare the '\0'
+		printf("%c   %c\n",args1[i],args2[i]);
 		if(args1[i] != args2[i]){
+			//printf("%c,%c",args1[i],args2[i]);
 			return -1;
 		}
         }
@@ -160,6 +164,7 @@ void mainLoop(void){
 		}
                 //printf("%s",getInput());
                 getUserEnvironmentVariable();
+		isMultipleCharacter = FALSE;
         }
 
         while(true);
