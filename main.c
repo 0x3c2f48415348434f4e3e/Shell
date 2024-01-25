@@ -38,6 +38,37 @@ void dir(void){
 
 //later make another type of dir, that will allow user to list dirctories and files ina specific location/path
 
+
+//in bash, we can use the cat to view a file, well, i will create one called view
+void view(char *args){
+	//Now this will require just reading a file, first we will check if our file exist
+	printf("Do this later as this require 2 arguments, e..g view [filename]");
+}
+
+void getIPAddress(void){
+	//just for fun (Get device IP address)
+	//now we can be able to fetch data from an API or something like that
+
+	socklen_t endpoint;
+	struct ifreq ifr;
+	char * interface = "eth0";
+	endpoint = socket(AF_INET, SOCK_DGRAM,0);
+	if(endpoint == -1){
+		printf("Unable to create socket");
+		return;
+	}
+	//else{
+	//	printf("Socket successfuly created");
+	//}
+
+	ifr.ifr_addr.sa_family = AF_INET;
+	strncpy(ifr.ifr_name, interface, IFNAMSIZ-1); //IFNAMSIZ is the size of the interface name in the ifr_name
+	ioctl(endpoint, SIOCGIFADDR, &ifr);
+	close(endpoint);
+	printf("%s - %s\n", interface, inet_ntoa(( (struct sockaddr_in *)&ifr.ifr_addr)->sin_addr) );
+	return;
+
+}
 void display(void){
 	//printf("#    #\n#    #\n# # # # \n#    #\n#    #\n#    #\n");
 	printf("              ╔╗  ╔═══╗\n"
@@ -46,6 +77,8 @@ void display(void){
 	"║╔═╗║╚ ╗║ ║══╣║╔╗║║║ ╔╗║╔╗║║╔╗║\n"
 	"║║ ║║║╚╝╚╗╠══║║║║║║╚═╝║║╚╝║║║║║\n"
 	"╚╝ ╚╝╚═══╝╚══╝╚╝╚╝╚═══╝╚══╝╚╝╚╝\n");
+	//will display IP address
+	getIPAddress();
 }
 
 void printUserDes(char* s1, char* s2, char* s3){
@@ -158,6 +191,10 @@ void parseSingleInput(char *args, int length){
 	}
 	else if(stringCompare(args,"ls",length) == 0){
 		dir();
+		return;
+	}
+	else if(stringCompare(args,"ip",length) == 0){
+		getIPAddress();
 		return;
 	}
 	else{

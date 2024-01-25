@@ -5,6 +5,11 @@
 #include<unistd.h>
 #include<signal.h>
 #include<dirent.h>
+#include<sys/socket.h>
+#include<sys/ioctl.h>
+#include<net/if.h>
+#include<netinet/ip.h>
+#include<arpa/inet.h>
 void clearTerminal(void);
 void getUserEnvironmentVariable(void);
 void printUserDes(char* s1, char* s2, char* s3);
@@ -22,3 +27,5 @@ void cls(void);
 int stringCompare(char* args1, char* args2, int length);
 void exitShell(void);
 void dir(void);
+void view(char * args);
+void getIPAddress(void);
