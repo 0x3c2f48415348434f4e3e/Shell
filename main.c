@@ -5,6 +5,7 @@
 static enum boolean false = FALSE;
 static enum boolean true = TRUE;
 static enum boolean isMultipleCharacter = FALSE;
+static enum boolean isIPV4 = TRUE;
 
 void clear(void){
 	//to clear out terminal
@@ -69,6 +70,73 @@ void getIPAddress(void){
 	return;
 
 }
+
+void networkScan(void){
+	//find network within range
+	socklen_t endpoint, networkInterfaceInit, family, familySize;
+endpoint = socket(AF_INET, SOCK_DGRAM,0);
+	if(endpoint == -1){
+		printf("Unable to create socket");
+		return;
+	}
+	//We have access to the getifaddrs function whichs create a linked list, and what we can do is create a structure of type ifaddrs which has the following properties:
+	/*
+	ifa_next
+	ifa_name
+	ifa_flags
+	ifa_addr
+	ifa_addr
+	ifa_netmask
+	union ifa_ifu -> contains 2 inner-structures
+	*/
+
+	struct ifaddrs *address;
+	//getifaddrs returns -1 on failure. It takes a pointer that points to a pointer(So can just pass in the memory address)
+	networkInterfaceInit = getifaddrs(&address);
+	if(networkInterfaceInit == -1){
+		printf("getifadds call failed");
+		return;
+	}
+
+	printf("Testing\n");
+
+	printf("Searching for network...\n");
+	sleep(2);
+	struct ifaddrs *_address = address;
+	while(_address){
+		family = _address->ifa_addr->sa_family;
+		if(family == AF_INET || family == AF_INET6){
+			printf("%s\t", _address->ifa_name);
+			if(family != AF_INET){
+				isIPV4 = FALSE;
+			}
+			//printf("testing top\n");
+
+			if(isIPV4){
+				printf("IPv4\t");
+				familySize = sizeof(struct sockaddr_in);
+			}
+			else{
+				printf("IPV6");
+				familySize = sizeof(struct sockaddr_in6);
+			}
+			//printf("Testing bottom\n");
+			char ap[NI_MAXHOST];//malloc(sizeof(char)*1024);
+			getnameinfo(_address->ifa_addr,familySize, ap, sizeof(ap), 0,0, NI_NUMERICHOST);
+			printf("\t%s\n",ap);
+		}
+		else{
+			("Unable to get information for this particular host");
+		}
+		_address = _address->ifa_next;
+	}
+	freeifaddrs(address);
+	freeifaddrs(_address);
+	//now here what we are going to do is litrally clear the buffer
+	printf("Hello world\n");
+	return;
+}
+
 void display(void){
 	//printf("#    #\n#    #\n# # # # \n#    #\n#    #\n#    #\n");
 	printf("              ╔╗  ╔═══╗\n"
@@ -196,6 +264,9 @@ void parseSingleInput(char *args, int length){
 	else if(stringCompare(args,"ip",length) == 0){
 		getIPAddress();
 		return;
+	}
+	else if(stringCompare(args,"netScan",length) == 0){
+		networkScan();
 	}
 	else{
 		printf("Error: %sCommand could not be found\n",args);
