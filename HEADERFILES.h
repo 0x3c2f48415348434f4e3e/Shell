@@ -10,6 +10,9 @@
 #include<net/if.h>
 #include<netinet/ip.h>
 #include<arpa/inet.h>
+#include<sys/types.h>
+#include<ifaddrs.h>
+#include<netdb.h>
 void clearTerminal(void);
 void getUserEnvironmentVariable(void);
 void printUserDes(char* s1, char* s2, char* s3);
@@ -29,3 +32,4 @@ void exitShell(void);
 void dir(void);
 void view(char * args);
 void getIPAddress(void);
+void networkScan(void);
