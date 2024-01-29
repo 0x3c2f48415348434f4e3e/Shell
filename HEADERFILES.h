@@ -33,3 +33,5 @@ void dir(void);
 void view(char * args);
 void getIPAddress(void);
 void networkScan(void);
+void flushShell(void);
+void listWirelessNetworks();

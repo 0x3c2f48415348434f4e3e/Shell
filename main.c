@@ -1,6 +1,7 @@
 #include"HEADERFILES.h"
 #define clearTerminal() printf("\033[H\033[J")
-
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 //void initBool(void){
 static enum boolean false = FALSE;
 static enum boolean true = TRUE;
@@ -16,6 +17,13 @@ void clear(void){
 void exitShell(void){
 	//Now to be able to exit our program, we cna use the exit function
 	exit(EXIT_SUCCESS);
+}
+
+void flushShell(void){
+	char c;
+	while((c = getchar()) && (c != '\n') && (c != EOF));
+	printf("%c",c);
+	return;
 }
 
 void dir(void){
@@ -71,10 +79,12 @@ void getIPAddress(void){
 
 }
 
-void networkScan(void){
+//Having issue with the networkScan function, so we are going to focus on that
+
+void ipInfo(void){
 	//find network within range
-	socklen_t endpoint, networkInterfaceInit, family, familySize;
-endpoint = socket(AF_INET, SOCK_DGRAM,0);
+	socklen_t endpoint, networkInterfaceInit, family, familySize, s;
+	endpoint = socket(AF_INET, SOCK_DGRAM,0);
 	if(endpoint == -1){
 		printf("Unable to create socket");
 		return;
@@ -90,6 +100,8 @@ endpoint = socket(AF_INET, SOCK_DGRAM,0);
 	union ifa_ifu -> contains 2 inner-structures
 	*/
 
+	//So what i am going to do is a huge test
+
 	struct ifaddrs *address;
 	//getifaddrs returns -1 on failure. It takes a pointer that points to a pointer(So can just pass in the memory address)
 	networkInterfaceInit = getifaddrs(&address);
@@ -101,9 +113,13 @@ endpoint = socket(AF_INET, SOCK_DGRAM,0);
 	printf("Testing\n");
 
 	printf("Searching for network...\n");
-	sleep(2);
-	struct ifaddrs *_address = address;
-	while(_address){
+	//sleep(2);
+	//struct ifaddrs *_address = address;
+	//while(_address){
+	for(struct ifaddrs *_address = address; _address !=NULL; _address = _address->ifa_next){
+		if(_address->ifa_addr == NULL){
+			continue;
+		}
 		family = _address->ifa_addr->sa_family;
 		if(family == AF_INET || family == AF_INET6){
 			printf("%s\t", _address->ifa_name);
@@ -122,29 +138,54 @@ endpoint = socket(AF_INET, SOCK_DGRAM,0);
 			}
 			//printf("Testing bottom\n");
 			char ap[NI_MAXHOST];//malloc(sizeof(char)*1024);
-			getnameinfo(_address->ifa_addr,familySize, ap, sizeof(ap), 0,0, NI_NUMERICHOST);
+			//getnameinfo(_address->ifa_addr,familySize, ap, sizeof(ap), 0,0, NI_NUMERICHOST);
+			s = getnameinfo(_address->ifa_addr,familySize,ap,NI_MAXHOST,NULL,0,NI_NUMERICHOST);
+			if(s !=0){
+				printf("getnameinfo() failed: %s\n", gai_strerror(s));
+			}
 			printf("\t%s\n",ap);
 		}
 		else{
 			("Unable to get information for this particular host");
 		}
-		_address = _address->ifa_next;
+		//_address = _address->ifa_next;
 	}
+	//freeifaddrs(address);
+	//freeifaddrs(address);
+	/*
+
+	*/
+	//lets free the memory space
+	//Now what i am going to do for now, since i have tried everything is a temporary fix
 	freeifaddrs(address);
-	freeifaddrs(_address);
-	//now here what we are going to do is litrally clear the buffer
-	printf("Hello world\n");
-	return;
+	//fflush(stdout);
+	/*int wait = 5;
+	printf("Please wait");
+	while(wait !=0){
+		printf(".");
+		wait-=1;
+		sleep(2);
+	}*/
+	//freeifaddrs(address);
+	sleep(5);
+	system("./temp.sh");
+	//return;
+	exit(EXIT_SUCCESS);
+}
+
+void listWirelessNetworks(){
+	printf("To list wireless networks");
 }
 
 void display(void){
+	//printf(ANSI_COLOR_RED     "This text is RED!"     ANSI_COLOR_RESET "\n");
 	//printf("#    #\n#    #\n# # # # \n#    #\n#    #\n#    #\n");
-	printf("              ╔╗  ╔═══╗\n"
+	printf(ANSI_COLOR_RED"              ╔╗  ╔═══╗\n"
 	"║║ ║║         ║║  ║╔═╗║\n"
 	"║╚═╝║╔══╗ ╔══╗║╚═╗║║ ╚╝╔══╗╔══╗\n"
 	"║╔═╗║╚ ╗║ ║══╣║╔╗║║║ ╔╗║╔╗║║╔╗║\n"
 	"║║ ║║║╚╝╚╗╠══║║║║║║╚═╝║║╚╝║║║║║\n"
-	"╚╝ ╚╝╚═══╝╚══╝╚╝╚╝╚═══╝╚══╝╚╝╚╝\n");
+	"╚╝ ╚╝╚═══╝╚══╝╚╝╚╝╚═══╝╚══╝╚╝╚╝\n" ANSI_COLOR_RESET "\n");
 	//will display IP address
 	getIPAddress();
 }
@@ -232,7 +273,7 @@ int stringCompare(char *args1, char *args2, int length){
 	//printf("Length of args1 is %i and args2 is %i",length,args2length);
 	//now lets check that length and args2length are the same, otherwise, it will not be the same command
 	if(length != args2length){
-		//printf("Not same length %i %i", length,args2length);
+		printf("Not same length %i %i", length,args2length);
 		return -1;
 	}
 
@@ -250,25 +291,32 @@ void parseSingleInput(char *args, int length){
 	//printf("To parse inputs");
 
 	if(stringCompare(args,"cls",length) == 0){
+		printf("%s\n",args);
 		cls();
 		return;
 	}
 	else if(stringCompare(args,"exit",length) == 0){
+		printf("%s\n",args);
 		exitShell();
 		return;
 	}
 	else if(stringCompare(args,"ls",length) == 0){
+		printf("%s\n",args);
 		dir();
 		return;
 	}
 	else if(stringCompare(args,"ip",length) == 0){
+		printf("%s\n",args);
 		getIPAddress();
 		return;
 	}
-	else if(stringCompare(args,"netScan",length) == 0){
-		networkScan();
+	else if(stringCompare(args,"ipScan",length) == 0){
+		printf("%s\n",args);
+		ipInfo();
+		return;
 	}
 	else{
+		printf("%s\n",args);
 		printf("Error: %sCommand could not be found\n",args);
 	}
 }
@@ -313,7 +361,7 @@ void mainLoop(void){
         cwd();
 }
 
-int main(int argc, char * argv){
+int main(int argc, char ** argv){
 	clearTerminal();
 	display();
 	getUserEnvironmentVariable();

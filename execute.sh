@@ -1,2 +1,2 @@
-gcc main.c -o output
+gcc -pedantic -g -lm main.c -o output
 
